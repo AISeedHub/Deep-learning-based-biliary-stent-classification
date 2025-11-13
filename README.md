@@ -1,7 +1,7 @@
 Deep learning based biliary stent classification and transfer learning adaptation to an additional stent type
 ============================================================================================================
 
-![Main Figure](assets/Figure 5a.tif)
+![Main Figure](assets/main_figure.png)
 
 ![Grad-CAM](assets/cam.jpg)
 
