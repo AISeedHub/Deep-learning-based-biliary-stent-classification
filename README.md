@@ -75,6 +75,23 @@ Training and fine-tuning
 ------------------------
 `training/finetune.py` uses timm to create a model, fine-tunes on your dataset, logs metrics to MLflow, and (optionally) exports Grad-CAMs for the validation set.
 
+### Training settings (example configuration)
+
+| Training setting | Configuration |
+| --- | --- |
+| Image resolution | (1536,1536) |
+| Batch size | 32 |
+| Optimizer | AdamW |
+| Learning rate | 1e-3 |
+| Weight decay | 5e-2 |
+| Random Erasing | 0.25 |
+| Warmup epochs | 10 |
+| Training epochs | 500 (Primary, Augmented); 100–500 (Transfer learning) |
+| Augmentation | RandAug |
+| Label smoothing | 0.1 |
+| Mixup [21] | 1.0 |
+| Cutmix [22] | 0.8 |
+
 Common arguments (subset):
 - `--model_name` (e.g., `efficientnet_b1.ft_in1k`, `resnet50.a1_in1k`, `deit_base_patch16_224`)
 - `--data_path` (root folder containing `train/` and `val/`)

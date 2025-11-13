@@ -22,23 +22,22 @@ from engine_finetune import train_one_epoch, evaluate
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Pytorch Image Classfication', add_help=False)
-    parser.add_argument('--batch_size', default=128, type=int)
-    parser.add_argument('--epochs', default=300, type=int)
+    parser.add_argument('--batch_size', default=32, type=int)
+    parser.add_argument('--epochs', default=500, type=int)
     parser.add_argument('--accum_iter', default=1, type=int)
-    parser.add_argument('--hf_token', default='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', type=str)
+    parser.add_argument('--hf_token', default=None, type=str)
 
     # Model parameters
     #parser.add_argument('--model_name', default='resnet18.a1_in1k', type=str, metavar='MODEL')
     parser.add_argument('--model_name', default='efficientnet_b1.ft_in1k', type=str, metavar='MODEL')
-    parser.add_argument('--input_size', default=224, type=int)
+    parser.add_argument('--input_size', default=1536, type=int)
     parser.add_argument('--drop_path', type=float, default=0.1, metavar='PCT')
     parser.add_argument('--pretrained', default=True, type=bool)
     parser.add_argument('--ckpt_path', default=None, type=str)
     # Dataset parameters
-    #parser.add_argument('--data_path', default="d://Pear_410_cnu", type=str) # train / val 로 구분되어야함
-    #parser.add_argument('--data_path', default="d://2025-pear-cls/aiseed_linux", type=str) # train / val 로 구분되어야함
-    parser.add_argument('--data_path', default=r"D:\set-B", type=str) # train / val 로 구분되어야함
-    parser.add_argument('--nb_classes', default=13, type=int)
+   
+    parser.add_argument('--data_path', required=True, type=str) # train / val 로 구분되어야함
+    parser.add_argument('--nb_classes', default=5, type=int)
     parser.add_argument('--output_dir', default='./output_dir')
     parser.add_argument('--log_dir', default=None)
     parser.add_argument('--device', default='cuda')
@@ -60,12 +59,12 @@ def get_args_parser():
     parser.add_argument('--warmup_epochs', type=int, default=10, metavar='N')
 
     # MLflow parameters
-    parser.add_argument('--mlflow_server' ,type=str, default = "http://168.131.151.120:5000", help='MLflow tracking server URI')
-    parser.add_argument('--mlflow_experiment', type=str, default='(전남진흥원)Pear Classification', help='MLflow experiment name')
-    parser.add_argument('--run_name', type=str, default='(classification_efficientnet_b1)', help='MLflow run name')
-    parser.add_argument('--mlflow_account_name', type=str, default='jin', help='MLflow account ID')
-    parser.add_argument('--mlflow_account_password', type=str, default='123', help='MLflow account password')
-    parser.add_argument('--zip_file_name', type=str, default="10.23.set1_gradcam_results", help='GradCAM file name')
+    parser.add_argument('--mlflow_server' ,type=str, default = None, help='MLflow tracking server URI')
+    parser.add_argument('--mlflow_experiment', type=str, default=None, help='MLflow experiment name')
+    parser.add_argument('--run_name', type=str, default=None, help='MLflow run name')
+    parser.add_argument('--mlflow_account_name', type=str, default=None, help='MLflow account ID')
+    parser.add_argument('--mlflow_account_password', type=str, default=None , help='MLflow account password')
+    parser.add_argument('--zip_file_name', type=str, default="fold1_gradcam_results", help='GradCAM file name')
 
 
     # Augmentation parameters
