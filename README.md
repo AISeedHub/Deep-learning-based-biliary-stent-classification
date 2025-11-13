@@ -1,6 +1,10 @@
 Deep learning based biliary stent classification and transfer learning adaptation to an additional stent type
 ============================================================================================================
 
+![Main Figure](assets/Figure 5a.tif)
+
+![Grad-CAM](assets/cam.jpg)
+
 Overview
 --------
 This repository contains the training, fine-tuning, and visualization code for a deep learning system that classifies biliary stents from endoscopic images and adapts (via transfer learning) to an additional stent type. The codebase supports:
@@ -9,7 +13,7 @@ This repository contains the training, fine-tuning, and visualization code for a
 - Automatic Grad-CAM export on the validation set
 - ROC/AUC analysis across epochs and sets, DeLong tests, and confusion matrices
 
-You will add main figures and Grad-CAM results as assets when available; placeholders are referenced below.
+You can replace the top images with your final paper-ready figures by updating the files in `assets/`.
 
 Repository layout
 -----------------
@@ -22,19 +26,9 @@ Repository layout
   - `delong_test_adaptive_heatmap.py`: DeLong tests and meta-analysis across epochs; adaptive heatmaps
   - `single_con.py`: confusion matrix visualization using Grad-CAM CSV outputs
 
-Figures (placeholders you will replace)
----------------------------------------
-Place your paper-ready figures under:
-- `assets/figures/main_figure.png`  (Main Figure)
-- `assets/figures/gradcam_example.png`  (Representative Grad-CAM)
-- Optionally:
-  - `assets/figures/roc_curves_case1.png`, `assets/figures/roc_curves_single.png`
-  - `assets/figures/confusion_matrix_average.png`
-  - `assets/figures/all_cases_adaptive_heatmap.png`
-
-Example embeds (will render once files are added):
-![Main Figure](assets/figures/main_figure.png)
-![Grad-CAM](assets/figures/gradcam_example.png)
+Featured figures
+----------------
+Top images are rendered from `assets/Figure 5a.tif` (main figure) and `assets/cam.jpg` (Grad-CAM example). You can change filenames or add additional figures as needed.
 
 Environment
 -----------
@@ -181,8 +175,8 @@ Reproducibility tips
 
 Results
 -------------------------------------------------------------
-- Main performance figure: `assets/main_figure.png`
-- Representative Grad-CAM: `assets/cam.png`
+- Main performance figure: `assets/Figure 5a.tif`
+- Representative Grad-CAM: `assets/cam.jpg`
 
 Citation
 --------
@@ -195,7 +189,7 @@ Venue: [Journal/Conference]
 
 License
 -------
-This project is licensed under the terms of the license in `LICENSE`.
+This project is licensed under the MIT License. See `LICENSE` for details.
 
 Contact
 -------
