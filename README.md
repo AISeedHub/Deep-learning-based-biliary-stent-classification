@@ -175,7 +175,7 @@ Reproducibility tips
 
 Results
 -------------------------------------------------------------
-- Main performance figure: `assets/Figure 5a.tif`
+- Main performance figure: `assets/main_figure.png`
 - Representative Grad-CAM: `assets/cam.jpg`
 
 Citation
