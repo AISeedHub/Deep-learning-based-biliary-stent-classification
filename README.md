@@ -179,12 +179,10 @@ Reproducibility tips
 - Log all hyperparameters to MLflow and export artifacts (models, Grad-CAM ZIP).
 - When comparing epochs, keep dataset splits and evaluation code identical.
 
-Results placeholders (to be replaced with your final figures)
+Results
 -------------------------------------------------------------
-- Main performance figure: `assets/figures/main_figure.png`
-- Representative Grad-CAM: `assets/figures/gradcam_example.png`
-- Average confusion matrix: `assets/figures/confusion_matrix_average.png`
-- Adaptive heatmap of DeLong tests: `assets/figures/all_cases_adaptive_heatmap.png`
+- Main performance figure: `assets/main_figure.png`
+- Representative Grad-CAM: `assets/cam.png`
 
 Citation
 --------

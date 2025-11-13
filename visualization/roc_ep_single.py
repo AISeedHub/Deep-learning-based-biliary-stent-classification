@@ -24,9 +24,9 @@ print(f"Using device: {device}")
 #model_name = 'resnet50.a1_in1k'
 #model_name = 'efficientnet_b0'
 model_name = 'deit_base_patch16_224' 
-num_classes = 5  # 5개 클래스로 변경
+num_classes = 5  # changed to 5 classes
 
-# Image preprocessing - 변경된 설정
+# Image preprocessing - updated settings
 preprocess = transforms.Compose([
     transforms.Resize(size=1536, interpolation=transforms.InterpolationMode.BICUBIC, antialias=True),
     transforms.CenterCrop(size=(1536, 1536)),
@@ -36,7 +36,7 @@ preprocess = transforms.Compose([
 
 # Configuration
 epochs = [100, 200, 300, 400, 500]
-case = 'case1'  # 하나의 케이스만 처리
+case = 'case1'  # process a single case
 sets = ['set1', 'set2', 'set3', 'set4', 'set5']
 
 # Root paths for case (dataset paths)
@@ -50,7 +50,7 @@ weight_root_path = r"d:\\vit\transfer\single"
 
 
 
-# 전체 성능 지표를 저장할 리스트 추가r
+# List to store all performance metrics
 all_performance_metrics = []
 
 def load_model_with_weights(weight_path, model_name, num_classes, device):
@@ -63,7 +63,7 @@ def load_model_with_weights(weight_path, model_name, num_classes, device):
             model = torch.load(weight_path, map_location=device)
             model.to(device)
             model.eval()
-            print(f"      Model loaded successfully fom: {weight_path}")
+            print(f"      Model loaded successfully from: {weight_path}")
             return model
         except Exception as e1:
             print(f"      Direct torch.load failed: {e1}")
@@ -101,7 +101,7 @@ def load_model_with_weights(weight_path, model_name, num_classes, device):
 
 def get_class_mapping(val_folder):
     """
-    폴더 이름을 알파벳 순서로 정렬하여 클래스 매핑 생성 (0, 1)
+    Create class mapping (0..C-1) by sorting subfolder names alphabetically
     """
     class_names = []
     for class_name in os.listdir(val_folder):
@@ -109,10 +109,10 @@ def get_class_mapping(val_folder):
         if os.path.isdir(class_dir):
             class_names.append(class_name)
     
-    # 알파벳 순서로 정렬
+    # Sort alphabetically
     class_names.sort()
     
-    # 클래스 이름 -> 인덱스 매핑 생성
+    # Build class_name -> index mapping
     class_to_idx = {name: idx for idx, name in enumerate(class_names)}
     
     print(f"      Class mapping: {class_to_idx}")
@@ -121,7 +121,7 @@ def get_class_mapping(val_folder):
 def predict_images_in_folder(model, val_folder, preprocess, device):
     """
     Process all images in validation folder and get predictions
-    클래스 매핑 정보 추가
+    Include class mapping information
     """
     results = []
     
@@ -129,7 +129,7 @@ def predict_images_in_folder(model, val_folder, preprocess, device):
         print(f"      Validation folder not found: {val_folder}")
         return results
     
-    # 폴더 이름 기반 클래스 매핑 생성
+    # Create class mapping based on folder names
     class_to_idx = get_class_mapping(val_folder)
     
     for class_name in sorted(os.listdir(val_folder)):
@@ -137,7 +137,7 @@ def predict_images_in_folder(model, val_folder, preprocess, device):
         if not os.path.isdir(class_dir):
             continue
         
-        # 클래스 이름에 대응하는 숫자 인덱스
+        # Numeric index corresponding to class name
         class_idx = class_to_idx[class_name]
         print(f"      Processing class: {class_name} (idx={class_idx})")
         
@@ -157,7 +157,7 @@ def predict_images_in_folder(model, val_folder, preprocess, device):
                     predicted_class = output.argmax(dim=1).item()
                     confidence = probabilities[0, predicted_class].item()
                     
-                    # 모든 클래스 확률 저장
+                    # Store probabilities for all classes
                     all_probs = probabilities[0].cpu().numpy()
                 
                 # [파일명, 실제클래스이름, 실제클래스인덱스, 예측클래스, 예측확률, 전체확률]
@@ -177,12 +177,12 @@ def process_predictions_for_roc(predictions, class_to_idx):
     df = pd.DataFrame(predictions, columns=['file_name', 'original_label', 'true_class_idx', 'predicted_class', 'confidence', 'all_probs'])
     num_classes = len(class_to_idx)
 
-    # 실제 분류에서 사용할 예측값: argmax
+    # Predicted class for actual classification: argmax
     y_true = df['true_class_idx'].values
     y_pred = df['predicted_class'].values
 
-    # 5개 클래스에 대해 클래스별 평균을 구하기 위해 all_probs 사용
-    y_score = np.array(df['all_probs'].tolist())  # 모든 클래스의 확률
+    # For 5-class classification, use all_probs for class-wise averaging
+    y_score = np.array(df['all_probs'].tolist())  # probabilities for all classes
     print(f"Multi-class classification: using all class probabilities for ROC/AUC.")
     print(f"Debug - y_score shape: {y_score.shape}")
 
@@ -231,7 +231,7 @@ def calculate_epoch_average_roc(epoch):
     epoch_tprs = []
     epoch_aucs = []
     
-    # 각 세트별 성능 지표를 저장할 리스트 추가
+    # Lists to collect per-set metrics for averaging
     set_accuracies = []
     set_precisions = []
     set_recalls = []
@@ -276,11 +276,11 @@ def calculate_epoch_average_roc(epoch):
                 print(f"    Warning: {set_name} doesn't have both classes")
                 continue
             
-            # 각 세트별 성능 지표 계산 및 저장
+            # Compute and store per-set performance metrics
             set_metrics = calculate_performance_metrics(y_true, y_pred, case, set_name, epoch)
             all_performance_metrics.append(set_metrics)
             
-            # 세트별 성능 지표를 리스트에 추가 (평균 계산용)
+            # Append per-set metrics for averaging
             set_accuracies.append(set_metrics['Accuracy'])
             set_precisions.append(set_metrics['Precision'])
             set_recalls.append(set_metrics['Recall'])
@@ -288,7 +288,7 @@ def calculate_epoch_average_roc(epoch):
             
             print(f"    {set_name} - Acc: {set_metrics['Accuracy']:.4f}, Prec: {set_metrics['Precision']:.4f}, Rec: {set_metrics['Recall']:.4f}, F1: {set_metrics['F1_Score']:.4f}")
             
-            # 클래스별 ROC curve 계산
+            # Compute ROC curve per class
             y_true_one_hot = np.zeros((len(y_true), num_classes))
             for i, lbl in enumerate(y_true):
                 y_true_one_hot[i, lbl] = 1
@@ -304,13 +304,13 @@ def calculate_epoch_average_roc(epoch):
                 all_fprs.append(fpr)
                 all_tprs.append(tpr)
             
-            # 클래스별 평균 AUC
+            # Class-wise mean AUC
             set_auc = np.mean(class_aucs)
             
-            # 클래스별 ROC 커브의 평균 계산
+            # Compute average of class ROC curves
             min_length = min(len(fpr) for fpr in all_fprs)
             
-            # 모든 커브를 같은 길이로 맞춤
+            # Align all curves to the same length
             aligned_fprs = []
             aligned_tprs = []
             for fpr, tpr in zip(all_fprs, all_tprs):
@@ -322,7 +322,7 @@ def calculate_epoch_average_roc(epoch):
                     aligned_fprs.append(fpr)
                     aligned_tprs.append(tpr)
             
-            # 평균 FPR, TPR 계산
+            # Compute mean FPR and TPR
             avg_fpr = np.mean(aligned_fprs, axis=0)
             avg_tpr = np.mean(aligned_tprs, axis=0)
             
@@ -342,7 +342,7 @@ def calculate_epoch_average_roc(epoch):
                 del model
             torch.cuda.empty_cache()
     
-    # 세트별 성능의 평균 계산
+    # Average performance across sets
     if len(set_accuracies) > 0:
         avg_accuracy = np.mean(set_accuracies)
         avg_precision = np.mean(set_precisions)
@@ -471,7 +471,7 @@ for i, (fpr, tpr, auc_score, epoch_label) in enumerate(zip(case_fprs, case_tprs,
                  label=f'{epoch_label} (AUC = {auc_score:.4f})')
         valid_aucs.append(auc_score)
 
-plt.plot([0, 1], [0, 1], 'k--', linewidth=1)  # 대각선 추가
+plt.plot([0, 1], [0, 1], 'k--', linewidth=1)  # add diagonal
 plt.xlim([-0.01, 1.01])
 plt.ylim([-0.01, 1.01])
 plt.xlabel('False Positive Rate (1-Specificity)', fontsize=12)
@@ -505,18 +505,18 @@ if valid_aucs:
     print(f"Best AUC: {max(valid_aucs):.4f}")
     print(f"Average AUC: {np.mean(valid_aucs):.4f}")
 
-# 전체 성능 지표를 CSV 파일로 저장
+# Save all performance metrics to CSV
 if all_performance_metrics:
     performance_df = pd.DataFrame(all_performance_metrics)
     #performance_df.to_csv('all_performance_metrics.csv', index=False)
     print(f"\nAll performance metrics saved: all_performance_metrics.csv")
     print(f"Total records: {len(all_performance_metrics)}")
     
-    # 간략한 통계 출력
+    # Brief statistics
     print("\nPerformance Metrics Summary:")
     print("-" * 40)
     
-    # 케이스별 전체 성능 (all_sets만 필터링)
+    # Overall performance by case (filter all_sets)
     overall_data = performance_df[performance_df['Set'] == 'all_sets']
     if not overall_data.empty:
         print("Overall Performance by Case:")
@@ -526,7 +526,7 @@ if all_performance_metrics:
             avg_f1 = case_data['F1_Score'].mean()
             print(f"  {case}: Acc={avg_acc:.4f}, F1={avg_f1:.4f}")
     
-    # 세트별 성능 (개별 세트만 필터링)
+    # Performance by set (exclude all_sets)
     set_data = performance_df[performance_df['Set'] != 'all_sets']
     if not set_data.empty:
         print("\nAverage Performance by Set:")

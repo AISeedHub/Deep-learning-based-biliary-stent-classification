@@ -24,7 +24,7 @@ print(f"Using device: {device}")
 model_name =   'resnet50.a1_in1k'
 num_classes = 2  # Adjust based on your dataset
 
-# Image preprocessing - 변경된 설정
+# Image preprocessing - updated settings
 preprocess = transforms.Compose([
     transforms.Resize(size=1536, interpolation=transforms.InterpolationMode.BICUBIC, antialias=True),
     transforms.CenterCrop(size=(1536, 1536)),
@@ -127,7 +127,7 @@ def load_model_with_weights(weight_path, model_name, num_classes, device):
 
 def get_class_mapping(val_folder):
     """
-    폴더 이름을 알파벳 순서로 정렬하여 클래스 매핑 생성 (0, 1)
+    Create class mapping (0..C-1) by sorting subfolder names alphabetically
     """
     class_names = []
     for class_name in os.listdir(val_folder):
@@ -135,10 +135,10 @@ def get_class_mapping(val_folder):
         if os.path.isdir(class_dir):
             class_names.append(class_name)
     
-    # 알파벳 순서로 정렬
+    # Sort alphabetically
     class_names.sort()
     
-    # 클래스 이름 -> 인덱스 매핑 생성
+    # Build class_name -> index mapping
     class_to_idx = {name: idx for idx, name in enumerate(class_names)}
     
     print(f"      Class mapping: {class_to_idx}")
@@ -147,7 +147,7 @@ def get_class_mapping(val_folder):
 def predict_images_in_folder(model, val_folder, preprocess, device):
     """
     Process all images in validation folder and get predictions
-    클래스 매핑 정보 추가
+    Include class mapping information
     """
     results = []
     
@@ -155,7 +155,7 @@ def predict_images_in_folder(model, val_folder, preprocess, device):
         print(f"      Validation folder not found: {val_folder}")
         return results
     
-    # 폴더 이름 기반 클래스 매핑 생성
+    # Create class mapping based on folder names
     class_to_idx = get_class_mapping(val_folder)
     
     for class_name in sorted(os.listdir(val_folder)):
@@ -163,7 +163,7 @@ def predict_images_in_folder(model, val_folder, preprocess, device):
         if not os.path.isdir(class_dir):
             continue
         
-        # 클래스 이름에 대응하는 숫자 인덱스
+        # Numeric index corresponding to class name
         class_idx = class_to_idx[class_name]
         print(f"      Processing class: {class_name} (idx={class_idx})")
         
@@ -183,7 +183,7 @@ def predict_images_in_folder(model, val_folder, preprocess, device):
                     predicted_class = output.argmax(dim=1).item()
                     confidence = probabilities[0, predicted_class].item()
                     
-                    # 모든 클래스 확률 저장
+                    # Store probabilities for all classes
                     all_probs = probabilities[0].cpu().numpy()
                 
                 # [파일명, 실제클래스이름, 실제클래스인덱스, 예측클래스, 예측확률, 전체확률]
@@ -203,16 +203,16 @@ def process_predictions_for_roc(predictions, class_to_idx):
     df = pd.DataFrame(predictions, columns=['file_name', 'original_label', 'true_class_idx', 'predicted_class', 'confidence', 'all_probs'])
     num_classes = len(class_to_idx)
 
-    # 실제 분류에서 사용할 예측값: argmax
+    # Predicted class for actual classification: argmax
     y_true = df['true_class_idx'].values
     y_pred = df['predicted_class'].values
 
     if num_classes == 2:
-        # 이진 분류 시 ROC 계산에는 클래스 1의 확률을 사용
+        # For binary classification, use probability of class 1 for ROC/AUC
         y_score = df['all_probs'].apply(lambda x: x[1]).values
         print("Binary classification: using class 1 probability for ROC/AUC.")
     else:
-        # 다중분류 시에는 argmax 확률을 그대로 사용 (필요 시 변경)
+        # For multi-class, use argmax confidence (adjust if needed)
         y_score = df['confidence'].values
         print("Multi-class classification: using argmax confidence for ROC/AUC.")
 
@@ -290,7 +290,7 @@ def calculate_set_average_roc(case_name, epoch):
     set_tprs = []
     set_aucs = []
     
-    # 각 세트별 성능 지표를 저장할 리스트 추가
+    # Lists to collect per-set metrics for averaging
     set_accuracies = []
     set_precisions = []
     set_recalls = []
@@ -335,11 +335,11 @@ def calculate_set_average_roc(case_name, epoch):
                 print(f"    Warning: {set_name} doesn't have both classes")
                 continue
             
-            # 각 세트별 성능 지표 계산 및 저장
+            # Compute and store per-set performance metrics
             set_metrics = calculate_performance_metrics(y_true, y_pred, case_name, set_name, epoch)
             all_performance_metrics.append(set_metrics)
             
-            # 세트별 성능 지표를 리스트에 추가 (평균 계산용)
+            # Append per-set metrics for averaging
             set_accuracies.append(set_metrics['Accuracy'])
             set_precisions.append(set_metrics['Precision'])
             set_recalls.append(set_metrics['Recall'])
@@ -347,7 +347,7 @@ def calculate_set_average_roc(case_name, epoch):
             
             print(f"    {set_name} - Acc: {set_metrics['Accuracy']:.4f}, Prec: {set_metrics['Precision']:.4f}, Rec: {set_metrics['Recall']:.4f}, F1: {set_metrics['F1_Score']:.4f}")
             
-            # ROC curve 계산 (각 세트별)
+            # Compute ROC curve (per set)
             fpr, tpr, _ = roc_curve(y_true, y_score)
             auc_score = roc_auc_score(y_true, y_score)
             
@@ -367,7 +367,7 @@ def calculate_set_average_roc(case_name, epoch):
                 del model
             torch.cuda.empty_cache()
     
-    # 세트별 성능의 평균 계산 (올바른 cross-validation 방식)
+    # Average performance across sets (proper cross-validation style)
     if len(set_accuracies) > 0:
         avg_accuracy = np.mean(set_accuracies)
         avg_precision = np.mean(set_precisions)
