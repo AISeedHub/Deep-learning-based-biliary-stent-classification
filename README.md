@@ -173,10 +173,6 @@ Reproducibility tips
 - Log all hyperparameters to MLflow and export artifacts (models, Grad-CAM ZIP).
 - When comparing epochs, keep dataset splits and evaluation code identical.
 
-Results
--------------------------------------------------------------
-- Main performance figure: `assets/main_figure.png`
-- Representative Grad-CAM: `assets/cam.jpg`
 
 Citation
 --------
