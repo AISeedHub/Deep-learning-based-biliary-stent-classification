@@ -21,7 +21,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
 # Model configuration
-model_name =   'resnet50.a1_in1k'
+model_name =   'resnet50d.a1_in1k'
 num_classes = 2  # Adjust based on your dataset
 
 # Image preprocessing - updated settings

@@ -26,7 +26,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # Configuration (all cases)
 # ──────────────────────────────
 # Model name
-model_name = 'resnet50.a1_in1k'  # ResNet 모델
+model_name = 'resnet50d.a1_in1k'  # ResNet 모델
 
 num_classes = 2  # Binary classification
 batch_size = 1   # Fix batch size to 1
